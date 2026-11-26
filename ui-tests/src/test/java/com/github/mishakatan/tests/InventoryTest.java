@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import com.github.mishakatan.data.User;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -23,7 +24,7 @@ class InventoryTest extends BaseTest {
 
     @BeforeEach
     void logIn() {
-        inventory = openLoginPage().loginAs("standard_user", "secret_sauce");
+        inventory = openLoginPage().loginAs(User.STANDARD);
     }
 
     @Test
@@ -69,7 +70,7 @@ class InventoryTest extends BaseTest {
         @DisplayName("problem_user добавляет Bolt T-Shirt в корзину")
         void problemUserCanAddBoltTShirt() {
             openLoginPage()
-                    .loginAs("problem_user", "secret_sauce")
+                    .loginAs(User.PROBLEM)
                     .addToCart("Sauce Labs Bolt T-Shirt")
                     .shouldHaveCartItemsCount(1);
         }

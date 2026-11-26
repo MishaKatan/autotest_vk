@@ -1,6 +1,6 @@
 # UI-тесты интернет-магазина Saucedemo
 
-Домашние задания №4–5: UI-тесты на Playwright for Java + JUnit 5 с паттерном Page Object.
+Домашние задания №4–6: UI-тесты на Playwright for Java + JUnit 5 с паттернами Page Object, Page Element, Loadable Component и другими.
 Проект лежит в папке [`ui-tests/`](ui-tests).
 
 Объект тестирования — демо-магазин [saucedemo.com](https://www.saucedemo.com).
@@ -22,7 +22,12 @@ mvn test -Dtest=SmokeSuite   # набор: smoke-тесты из пакета te
 
 ```
 ui-tests/src/test/java/com/github/mishakatan/
+├── data/
+│   └── User.java            тестовые пользователи (Value Object)
+├── elements/
+│   └── ProductCard.java     карточка товара (Page Element)
 ├── pages/
+│   ├── BasePage.java        общий предок страниц (Loadable Component)
 │   ├── LoginPage.java       страница входа
 │   └── InventoryPage.java   каталог товаров
 └── tests/
@@ -34,6 +39,17 @@ ui-tests/src/test/java/com/github/mishakatan/
 
 Тесты работают только через методы Page Object: локаторы и объект `Page` закрыты внутри страниц и `BaseTest`.
 Проверки — через `assertThat` из Playwright с автоожиданием, без `Thread.sleep`.
+
+## Паттерны
+
+| Паттерн | Где используется |
+|---|---|
+| Page Object | `LoginPage`, `InventoryPage`: локаторы и действия страницы закрыты внутри класса |
+| Page Element | `ProductCard`: карточка товара со своими локаторами, ищутся внутри карточки |
+| Loadable Component | `BasePage.waitUntilLoaded()`: страница проверяет, что загрузилась, до работы с ней; `LoginPage.open()` и `loginAs()` возвращают уже загруженную страницу |
+| Chain of invocations | методы страниц возвращают следующую страницу: `openLoginPage().loginAs(user).addToCart(...).shouldHaveCartItemsCount(1)` |
+| Value Object | `record User`: логин и пароль одним неизменяемым объектом, константы `User.STANDARD`, `User.LOCKED_OUT` и др. |
+| Data Provider | `LoginTest.usersWhoCanLogIn()`: поставщик пользователей для `@MethodSource` |
 
 ## Аннотации JUnit 5
 
@@ -47,7 +63,7 @@ ui-tests/src/test/java/com/github/mishakatan/
 | `@Disabled` | тест на известный баг `problem_user` |
 | `@Timeout` | `LoginTest`: не дольше 30 секунд на тест |
 | `assertAll` | `InventoryTest.catalogShowsAllProducts` |
-| `@ParameterizedTest` | `LoginTest.userCanLogIn`: три пользователя |
+| `@ParameterizedTest` | `LoginTest.userCanLogIn`: три пользователя из `@MethodSource` |
 | `@Nested` | `InventoryTest.Cart`: группа тестов корзины |
 | `@TestFactory` | `InventoryTest.Cart.cartCounterGrows`: динамические тесты по списку товаров |
 | `@Suite` | `SmokeSuite`: запуск по пакету и тегу |

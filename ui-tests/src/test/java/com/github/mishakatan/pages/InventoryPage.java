@@ -2,19 +2,26 @@ package com.github.mishakatan.pages;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
+import com.github.mishakatan.elements.ProductCard;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.AriaRole;
 
-public class InventoryPage {
+public class InventoryPage extends BasePage {
     private final Locator title;
     private final Locator productCards;
     private final Locator cartBadge;
 
     public InventoryPage(Page page) {
+        super(page);
         this.title = page.getByTestId("title");
         this.productCards = page.getByTestId("inventory-item");
         this.cartBadge = page.getByTestId("shopping-cart-badge");
+    }
+
+    @Override
+    public InventoryPage waitUntilLoaded() {
+        assertThat(productCards.first()).isVisible();
+        return this;
     }
 
     public void shouldBeOpened() {
@@ -22,10 +29,7 @@ public class InventoryPage {
     }
 
     public InventoryPage addToCart(String productName) {
-        productCards
-                .filter(new Locator.FilterOptions().setHasText(productName))
-                .getByRole(AriaRole.BUTTON, new Locator.GetByRoleOptions().setName("Add to cart"))
-                .click();
+        product(productName).addToCart();
         return this;
     }
 
@@ -35,5 +39,10 @@ public class InventoryPage {
 
     public void shouldHaveProductsCount(int expectedCount) {
         assertThat(productCards).hasCount(expectedCount);
+    }
+
+    private ProductCard product(String productName) {
+        return new ProductCard(productCards.filter(
+                new Locator.FilterOptions().setHasText(productName)));
     }
 }
