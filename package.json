@@ -1,0 +1,21 @@
+{
+  "name": "autotest_vk",
+  "version": "1.0.0",
+  "description": "Автотесты REST API авторизации DummyJSON на Playwright + TypeScript",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MishaKatan/autotest_vk.git"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
+}
