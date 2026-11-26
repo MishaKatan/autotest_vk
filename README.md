@@ -1,6 +1,6 @@
 # UI-тесты интернет-магазина Saucedemo
 
-Домашние задания №4–6: UI-тесты на Playwright for Java + JUnit 5 с паттернами Page Object, Page Element, Loadable Component и другими.
+Домашние задания №4–7: UI-тесты на Playwright for Java + JUnit 5 с паттернами Page Object, Page Element, Loadable Component и другими.
 Проект лежит в папке [`ui-tests/`](ui-tests).
 
 Объект тестирования — демо-магазин [saucedemo.com](https://www.saucedemo.com).
@@ -50,6 +50,29 @@ ui-tests/src/test/java/com/github/mishakatan/
 | Chain of invocations | методы страниц возвращают следующую страницу: `openLoginPage().loginAs(user).addToCart(...).shouldHaveCartItemsCount(1)` |
 | Value Object | `record User`: логин и пароль одним неизменяемым объектом, константы `User.STANDARD`, `User.LOCKED_OUT` и др. |
 | Data Provider | `LoginTest.usersWhoCanLogIn()`: поставщик пользователей для `@MethodSource` |
+
+## Правила локаторов
+
+1. **Один тестовый атрибут на проект** — `data-test`. Он задан один раз в `BaseTest`
+   (`setTestIdAttribute("data-test")`), элементы ищутся через `getByTestId`.
+2. **Не зависим от языка интерфейса** — не ищем по надписям кнопок и полей
+   (`"Login"`, `"Add to cart"`): при переводе или смене текста локатор не сломается.
+3. **Нет CSS-классов, XPath и индексов** (`nth-child`, `first()`): они ломаются при изменении вёрстки.
+4. **Динамический атрибут — по префиксу.** У кнопки добавления в корзину атрибут свой у каждого товара
+   (`add-to-cart-sauce-labs-backpack`), поэтому она ищется как `[data-test^='add-to-cart']` внутри карточки.
+5. **Поиск по смыслу внутри родителя.** Карточка товара выбирается по элементу названия
+   (`inventory-item-name`), а её кнопка ищется только внутри этой карточки.
+   Имя товара здесь — входные данные теста, а не надпись интерфейса.
+6. **Один дом для локатора** — `private final` поля Page Object и Page Element, тесты локаторов не видят.
+7. **Локаторы ленивые.** `Locator` в Playwright ищет элемент заново при каждом действии и сам ждёт его появления,
+   поэтому нет устаревших ссылок на узлы DOM и `Thread.sleep`.
+
+| Элемент | Локатор |
+|---|---|
+| Поля входа, кнопка входа, ошибка | `getByTestId("username")`, `"password"`, `"login-button"`, `"error"` |
+| Заголовок, список, карточки, значок корзины | `getByTestId("title")`, `"inventory-list"`, `"inventory-item"`, `"shopping-cart-badge"` |
+| Карточка конкретного товара | `inventory-item`, внутри которой `inventory-item-name` с именем товара |
+| Кнопка «в корзину» | `[data-test^='add-to-cart']` внутри карточки |
 
 ## Аннотации JUnit 5
 

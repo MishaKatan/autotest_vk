@@ -10,17 +10,19 @@ public class InventoryPage extends BasePage {
     private final Locator title;
     private final Locator productCards;
     private final Locator cartBadge;
+    private final Locator productList;
 
     public InventoryPage(Page page) {
         super(page);
         this.title = page.getByTestId("title");
         this.productCards = page.getByTestId("inventory-item");
         this.cartBadge = page.getByTestId("shopping-cart-badge");
+        this.productList = page.getByTestId("inventory-list");
     }
 
     @Override
     public InventoryPage waitUntilLoaded() {
-        assertThat(productCards.first()).isVisible();
+        assertThat(productList).isVisible();
         return this;
     }
 
@@ -42,7 +44,8 @@ public class InventoryPage extends BasePage {
     }
 
     private ProductCard product(String productName) {
-        return new ProductCard(productCards.filter(
-                new Locator.FilterOptions().setHasText(productName)));
+        Locator name = page.getByTestId("inventory-item-name")
+                .filter(new Locator.FilterOptions().setHasText(productName));
+        return new ProductCard(productCards.filter(new Locator.FilterOptions().setHas(name)));
     }
 }
