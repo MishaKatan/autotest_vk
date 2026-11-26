@@ -32,4 +32,8 @@ public class InventoryPage {
     public void shouldHaveCartItemsCount(int expectedCount) {
         assertThat(cartBadge).hasText(String.valueOf(expectedCount));
     }
+
+    public void shouldHaveProductsCount(int expectedCount) {
+        assertThat(productCards).hasCount(expectedCount);
+    }
 }

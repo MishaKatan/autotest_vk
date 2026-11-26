@@ -1,6 +1,6 @@
 # UI-тесты интернет-магазина Saucedemo
 
-Домашнее задание №4: UI-тесты на Playwright for Java + JUnit 5 с паттерном Page Object.
+Домашние задания №4–5: UI-тесты на Playwright for Java + JUnit 5 с паттерном Page Object.
 Проект лежит в папке [`ui-tests/`](ui-tests).
 
 Объект тестирования — демо-магазин [saucedemo.com](https://www.saucedemo.com).
@@ -12,7 +12,10 @@
 
 ```bash
 cd ui-tests
-mvn test
+mvn test                     # все тесты
+mvn test -Dtest=LoginTest    # один класс
+mvn test -Dgroups=smoke      # по тегу
+mvn test -Dtest=SmokeSuite   # набор: smoke-тесты из пакета tests
 ```
 
 ## Структура
@@ -25,19 +28,40 @@ ui-tests/src/test/java/com/github/mishakatan/
 └── tests/
     ├── BaseTest.java        запуск браузера, свой контекст на каждый тест
     ├── LoginTest.java       тесты входа
-    └── InventoryTest.java   тесты каталога
+    ├── InventoryTest.java   тесты каталога и корзины
+    └── SmokeSuite.java      набор smoke-тестов
 ```
 
 Тесты работают только через методы Page Object: локаторы и объект `Page` закрыты внутри страниц и `BaseTest`.
 Проверки — через `assertThat` из Playwright с автоожиданием, без `Thread.sleep`.
 
+## Аннотации JUnit 5
+
+| Аннотация | Где используется |
+|---|---|
+| `@Test` | все обычные тесты |
+| `@BeforeAll` / `@AfterAll` | `BaseTest`: запуск и закрытие браузера |
+| `@BeforeEach` / `@AfterEach` | `BaseTest`: новый контекст на тест; `InventoryTest`: вход перед тестом |
+| `@DisplayName` | названия классов и тестов в отчёте |
+| `@Tag` | `smoke`, `negative` |
+| `@Disabled` | тест на известный баг `problem_user` |
+| `@Timeout` | `LoginTest`: не дольше 30 секунд на тест |
+| `assertAll` | `InventoryTest.catalogShowsAllProducts` |
+| `@ParameterizedTest` | `LoginTest.userCanLogIn`: три пользователя |
+| `@Nested` | `InventoryTest.Cart`: группа тестов корзины |
+| `@TestFactory` | `InventoryTest.Cart.cartCounterGrows`: динамические тесты по списку товаров |
+| `@Suite` | `SmokeSuite`: запуск по пакету и тегу |
+
 ## Что проверяется
 
 | Тест | Проверка |
 |---|---|
-| `LoginTest.standardUserCanLogIn` | вход под `standard_user` открывает каталог товаров |
+| `LoginTest.userCanLogIn` | вход под `standard_user`, `problem_user`, `visual_user` открывает каталог |
 | `LoginTest.lockedOutUserSeesError` | вход под `locked_out_user` показывает ошибку о блокировке |
-| `InventoryTest.addedProductIsShownInCartBadge` | после добавления товара на значке корзины `1` |
+| `InventoryTest.catalogShowsAllProducts` | каталог открыт, в нём 6 товаров |
+| `InventoryTest.Cart.addedProductIsShownInCartBadge` | после добавления товара на значке корзины `1` |
+| `InventoryTest.Cart.cartCounterGrows` | счётчик корзины растёт: 1, 2, 3 |
+| `InventoryTest.Cart.problemUserCanAddBoltTShirt` | отключён: `problem_user` не может добавить Bolt T-Shirt (баг сайта) |
 
 # Автотесты REST API авторизации DummyJSON
 
