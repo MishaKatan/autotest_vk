@@ -1,3 +1,44 @@
+# UI-тесты интернет-магазина Saucedemo
+
+Домашнее задание №4: UI-тесты на Playwright for Java + JUnit 5 с паттерном Page Object.
+Проект лежит в папке [`ui-tests/`](ui-tests).
+
+Объект тестирования — демо-магазин [saucedemo.com](https://www.saucedemo.com).
+Тестовые учётные данные публичные, они указаны на странице входа.
+
+## Запуск
+
+Требуются JDK 21+ и Maven. При первом запуске Playwright сам скачает браузер Chromium.
+
+```bash
+cd ui-tests
+mvn test
+```
+
+## Структура
+
+```
+ui-tests/src/test/java/com/github/mishakatan/
+├── pages/
+│   ├── LoginPage.java       страница входа
+│   └── InventoryPage.java   каталог товаров
+└── tests/
+    ├── BaseTest.java        запуск браузера, свой контекст на каждый тест
+    ├── LoginTest.java       тесты входа
+    └── InventoryTest.java   тесты каталога
+```
+
+Тесты работают только через методы Page Object: локаторы и объект `Page` закрыты внутри страниц и `BaseTest`.
+Проверки — через `assertThat` из Playwright с автоожиданием, без `Thread.sleep`.
+
+## Что проверяется
+
+| Тест | Проверка |
+|---|---|
+| `LoginTest.standardUserCanLogIn` | вход под `standard_user` открывает каталог товаров |
+| `LoginTest.lockedOutUserSeesError` | вход под `locked_out_user` показывает ошибку о блокировке |
+| `InventoryTest.addedProductIsShownInCartBadge` | после добавления товара на значке корзины `1` |
+
 # Автотесты REST API авторизации DummyJSON
 
 Домашнее задание: тесты REST API на Playwright + TypeScript (Взял вместо movix, чтобы никакие секреты не утекли, но с таким же стеком для тренировки).

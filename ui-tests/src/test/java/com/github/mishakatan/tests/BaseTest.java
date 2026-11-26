@@ -3,6 +3,7 @@ package com.github.mishakatan.tests;
 import com.github.mishakatan.pages.LoginPage;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import org.junit.jupiter.api.AfterAll;
@@ -23,8 +24,7 @@ public abstract class BaseTest {
     static void launchBrowser() {
         playwright = Playwright.create();
         playwright.selectors().setTestIdAttribute("data-test");
-        browser = playwright.chromium().launch();
-    }
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(500));    }
 
     @AfterAll
     static void closeBrowser() {
